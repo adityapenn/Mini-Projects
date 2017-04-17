@@ -13,7 +13,6 @@ from sklearn.cluster import DBSCAN
 from sklearn.preprocessing import StandardScaler
 from unidecode import unidecode
 import requests
-import pandas as pd
 import datetime
 get_ipython().magic(u'matplotlib inline')
 from dateutil.parser import parse
@@ -164,6 +163,98 @@ def scrape_data_90(start_date, from_place, to_place, city_name):
 
 
 #scrape_data(datetime.datetime(2017, 4, 20), 'NYC', 'Scandinavia', 'Copenhagen')
+
+#Task 3.1 
+def task_3_dbscan(flight_data):
+
+    X = np.concatenate([days[:, None], prices[:, None]], axis=1)
+    db = DBSCAN(eps=.30, min_samples=4).fit(X)
+    #Seems to work best with the above epsilon
+    
+    labels = db.labels_
+    clusters = len(set(labels))
+    unique_labels = set(labels)
+    colors = plt.cm.Spectral(np.linspace(0, 1, len(unique_labels)))
+
+    plt.subplots(figsize=(12, 8))
+
+    for k, c in zip(unique_labels, colors):
+        class_member_mask = (labels == k)
+        xy = X[class_member_mask]
+        plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=c,
+                 markeredgecolor='k', markersize=14)
+
+    plt.title("Total Clusters: {}".format(clusters), fontsize=14,
+              y=1.01)
+
+    days = np.arange(60)
+    prices1 = np.random.normal(0, 35, size=20) + 400
+    prices2 = np.random.normal(0, 35, size=20) + 800
+    prices3 = np.random.normal(0, 35, size=20) + 400
+    prices = np.concatenate([prices1, prices2, prices3], axis=0)
+
+    lbls = np.unique(db.labels_)
+    cluster_means = [np.mean(X[labels == num, :], axis=0) for num in range(lbls[-1] + 1)]
+    noise_point = X[30, :]
+
+    # euclidean distance
+    dist = [euclidean(noise_point, cm) for cm in cluster_means]
+
+    # chebyshev distance
+    dist = [chebyshev(noise_point, cm) for cm in cluster_means]
+
+    # cityblock distance
+    dist = [cityblock(noise_point, cm) for cm in cluster_means]
+
+    # Helper Functions
+    def calculate_cluster_means(X, labels):
+        lbls = np.unique(labels)
+        print "Cluster labels: {}".format(np.unique(lbls))
+        cluster_means = [np.mean(X[labels == num, :], axis=0) for num in range(lbls[-1] + 1)]
+        print "Cluster Means: {}".format(cluster_means)
+        return cluster_means
+
+    def print_3_distances(noise_point, cluster_means):
+        # euclidean
+        dist = [euclidean(noise_point, cm) for cm in cluster_means]
+        print "Euclidean distance: {}".format(dist)
+        # chebyshev
+        dist = [chebyshev(noise_point, cm) for cm in cluster_means]
+        print "Chebyshev distance: {}".format(dist)
+        # cityblock
+        dist = [cityblock(noise_point, cm) for cm in cluster_means]
+        print "Cityblock (Manhattan) distance: {}".format(dist)
+
+    def plot_the_clusters(X, dbscan_model, noise_point=None):
+        labels = dbscan_model.labels_
+        clusters = len(set(labels))
+        unique_labels = set(labels)
+        colors = plt.cm.Spectral(np.linspace(0, 1, len(unique_labels)))
+
+    plt.subplots(figsize=(12, 8))
+
+    for k, c in zip(unique_labels, colors):
+        class_member_mask = (labels == k)
+        xy = X[class_member_mask]
+        plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=c,
+                 markeredgecolor='k', markersize=14)
+
+    if noise_point is not None:
+        plt.plot(noise_point[0], noise_point[1], 'xr')
+
+    plt.title("Total Clusters: {}".format(clusters), fontsize=14, y=1.01)
+
+    def do_yo_thang(X, dbscan_model, noise_point):
+        cluster_means = calculate_cluster_means(X, dbscan_model.labels_)
+        print_3_distances(noise_point, cluster_means)
+        plot_the_clusters(X, dbscan_model, noise_point)
+
+    X_ss = StandardScaler().fit_transform(X)
+    db_ss = DBSCAN(eps=0.4, min_samples=3).fit(X_ss)
+    noise_point = X_ss[30, :]
+    do_yo_thang(X_ss, db_ss, noise_point)
+
+    plt.savefig('task_3_dbscan.png')
 
 
 #Task 3.2 - Finding the Inter-Quartile Range
