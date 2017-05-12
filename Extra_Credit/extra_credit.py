@@ -33,8 +33,6 @@ class KNN():
         posterior = len(x)/a #Finds the posterior probability
         print(posterior)
         print(type(posterior))
-        print()
-
 
 dataf=pd.read_csv('C:\\Users\\adity\\Desktop\\bloodxls1.csv') #Reading CSV file that consists the following information
 data=np.array(dataf.drop(['march'],1)) #Dropping unnecessary columns
