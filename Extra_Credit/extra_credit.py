@@ -1,48 +1,46 @@
-import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.neighbors import NearestNeighbors
+from sklearn import preprocessing, cross_validation, neighbors
 import pandas as pd
 
 class KNN():
     def __init__(self, X, y, k):
-        self.data = X
-        self.labels = y
-        self.neighbors = k
-
-        self.kneigh = NearestNeighbors(n_neighbors = 4, algorithm = 'kd_tree').fit(X) #Fitting our data X to the nearest neighbors KD-Tree algorithm
-
-        if type(self.labels[1]) == object: #Classifiers will have objects/strings as labels, as opposed to regressors which will have numerical values as labels
-            typ = 'C'
-        else:
-            typ = 'R' #The usage of 'typ' will be observed later in the program
-
-        data_point = np.array([0, 1, 2, 2]) #input argument to the following function
+        self.dataset = X
+        self.label = y
+        self.number = k
+        x_train,x_test,y_train,y_test=cross_validation.train_test_split(self.dataset,self.label,test_size=0.2) #Cross-validating data
+        print('Dataset:', self.dataset[:5])
+        print('Labels:', self.label[:5])
+        clf=neighbors.KNeighborsClassifier(n_neighbors = self.number, algorithm = 'kd_tree') #Maximum accuracy achieved with 7 neighbors
+        clf.fit(x_train,y_train)
+        accuracy=clf.score(x_test,y_test) #Calculating accuracy
+        print("Accuracy is:", accuracy)
+        #Making all variables in 'init' function global so they can be used in the 'predict' function
+        global a
+        global b
+        global c
+        global lf
+        a = self.number
+        b = self.dataset
+        c = self.label
+        lf = clf.fit(x_train, y_train)
     def predict(data_point):
+        lf=neighbors.KNeighborsClassifier(n_neighbors = a, algorithm = 'kd_tree') #Maximum accuracy achieved with 7 neighbors
+        x_train,x_test,y_train,y_test=cross_validation.train_test_split(b,c,test_size=0.2)
+        lf.fit(x_train,y_train)
+        prediction=lf.predict(data_point) #Returns the label as an array
+        x = " ".join(str(x) for x in prediction) #Returns the label as a string
+        print(type(x))
+        posterior = len(x)/a #Finds the posterior probability
+        print(posterior)
+        print(type(posterior))
+        print()
 
-        data1 = data_point.reshape(1,-1)
-        distances, indices = self.kneigh.kneighbors(data1, n_neighbors = self.neighbors, metric = 'euclidean') #Fitting our reshaped argument array to the k-neighbors algorithm
 
-        for d in indices:
-            ind = Counter(self.labels[d]) #Dict with each label and number of times it occurs
-
-        if typ == 'C': #For classifiers only
-            value = max(ind.values)
-            plabel = [sorted(key) for key, value in ind] #Get sorted labels
-            prob = max(ind.values)/self.neighbors #Finding posterior probability
-            return(plabel[0], prob)
-        else:
-            lab = [self.labels[d] for d in indices]
-            u = sum(lab)/len(lab)
-            for d2 in distances:
-                    absolute = 0
-                    absolute = absolute + abs(d2 - u)
-            avgd = absolute/k
-            print(u, avgd)
-
-df = pd.read_csv('breast-cancer-wisconsin.data.txt') #Data set taken from UCI's sample database, thanks to a Youtuber's tutorial video
-df.replace('?', -99999, inplace=True) #treat empty data as outliers
-df.drop(['id'], 1, inplace=True) #remove unnecessary columns that don't help determine whether the tumor is malignant or benign
-x = df.values
-y = df.columns.values
-k = 3
-df2 = KNN(x, y, k)
+dataf=pd.read_csv('C:\\Users\\adity\\Desktop\\bloodxls1.csv') #Reading CSV file that consists the following information
+data=np.array(dataf.drop(['march'],1)) #Dropping unnecessary columns
+labels=np.array(dataf['march']) #Taking 'March' as label
+k = 7
+KNN(data, labels, k)
+dp=np.array([2,50,10200,98])
+dp=dp.reshape(1,-1)
+KNN.predict(dp)
