@@ -45,8 +45,6 @@ KNN.predict(dp)
 
 #Task 2: Gradient Descent
 
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
@@ -54,15 +52,9 @@ from sklearn import datasets
 import math
 get_ipython().magic('matplotlib inline')
 
-
-
-
 def sigmoid(weight_vector, x_vector, return_deriv=True):
-
     sig = float(1) / (1 + math.e**(-x_vector.dot(weight_vector)))
-
     deriv = sig * (1 - sig)
-
     if return_deriv:
         return sig, deriv
     else:
@@ -90,8 +82,6 @@ from sklearn.metrics import accuracy_score
 print(X.dot(weight_vector)[:5])
 accuracy_score(np.round(X.dot(weight_vector)), y)
 
-
-
 def error(weight_vector, x_vector, y):
     log_func_v = sigmoid(weight_vector, x_vector)
     y = np.squeeze(y)
@@ -100,7 +90,7 @@ def error(weight_vector, x_vector, y):
     final = -step1 - step2
     return np.mean(final)
 
-#Task 1 - Stochastic Gradient Descent
+#Task 2.1 - Stochastic Gradient Descent
 n_epochs = 50
 t0, t1 = 5, 50 # learning schedule hyperparameters
 def perform_stochastic_gradient_descent(weight_vector, X, y, n_epochs, m):
@@ -115,7 +105,7 @@ def perform_stochastic_gradient_descent(weight_vector, X, y, n_epochs, m):
             print(accuracy_score(np.round(X.dot(weight_vector)), y))
         return weight_vector
         
-#Task 2 - Batch Gradient Descent
+#Task 2.2 - Batch Gradient Descent
 def perform_batch_gradient_descent(weight_vector, X, y, batch_size=100):
         n_iterations = 1000
         for iteration in range(n_iterations):
@@ -126,7 +116,7 @@ def perform_batch_gradient_descent(weight_vector, X, y, batch_size=100):
         return weight_vector
 
 
-#Task 3 - Batch Gradient Descent with new data
+#Task 2.3 - Batch Gradient Descent with new data
 def perform_batch_gradient_descent_new(weight_vector, batch_size=100):
     iris = datasets.load_iris()
     m=100
@@ -139,8 +129,6 @@ def perform_batch_gradient_descent_new(weight_vector, batch_size=100):
         weight_vector += eta * error(weight_vector, X, y) * sigmoid(weight_vector, X) * X
         print(accuracy_score(np.round(X.dot(weight_vector)), y))
     return weight_vector
-
-
 
 perform_batch_gradient_descent_new(weight_vector)
 perform_batch_gradient_descent(weight_vector, X, y)
